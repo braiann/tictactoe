@@ -1,8 +1,9 @@
 import {React, useEffect, useState} from "react";
+import Opponent from "../Opponent";
 import Button from "./Button";
 import Square from "./Square";
 
-export default function Board({endGame}) {
+export default function Board({isSinglePlayer, endGame}) {
     const [board, setBoard] = useState([
         0, 0, 0,
         0, 0, 0,
@@ -10,6 +11,12 @@ export default function Board({endGame}) {
     ]);
     const [turn, setTurn] = useState(1);
     const [gameWon, setGameWon] = useState(0);
+    const [moves, setMoves] = useState(0);
+
+    let opponent;
+    if (isSinglePlayer) {
+        opponent = new Opponent(markSquare);
+    }
 
     // These six trackers check if the game was won by player 1 or 2
     // after every move
@@ -22,6 +29,7 @@ export default function Board({endGame}) {
     const [yDiagonals, setYDiagonals] = useState([0, 0]);
 
     function markSquare(index, value) {
+        setMoves(prev => prev + 1);
         setBoard(prevBoard => {
             const newBoard = [...prevBoard];
             newBoard[index] = value;
@@ -95,7 +103,13 @@ export default function Board({endGame}) {
             yColumns.some(x => x === 3) ||
             yDiagonals.some(x => x === 3)) {
                 setGameWon(2);
-        } 
+        } else if (moves >= 9) {
+            setGameWon(3)
+        }
+        if (isSinglePlayer && gameWon === 0 && turn === 2 && moves < 8) {
+            console.log("turn: " + turn)
+            opponent.play(board);
+        }
     }, [board]);
 
     return (
@@ -103,7 +117,7 @@ export default function Board({endGame}) {
             {squareElements}
             {gameWon !== 0 &&
             <div className="game-won">
-                <h2>¡Ganó el jugador {gameWon === 1 ? '1' : '2'}!</h2>
+                <h2>{gameWon === 3 ? '¡Empate!' : `¡Ganó el jugador ${gameWon === 1 ? '1' : '2'}!`}</h2>
                 <Button text={"Volver"} onClick={endGame} />
             </div>
             }

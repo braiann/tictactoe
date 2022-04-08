@@ -13,13 +13,12 @@ function App() {
 
   function switchGameState(state) {
     setGameStarted(state);
-    console.log('game', state ? 'started' : 'ended')
   }
 
   return (
     <div className="App">
       {gameStarted ?
-        <Board endGame={() => switchGameState(false)}/> :
+        <Board isSinglePlayer={isSinglePlayer} endGame={() => switchGameState(false)}/> :
         <StartMenu
           isSinglePlayer={isSinglePlayer}
           switchPlayerMode={switchPlayerMode}
